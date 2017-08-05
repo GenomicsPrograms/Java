@@ -1,0 +1,56 @@
+package reformatter;
+import java.io.*;
+import java.util.regex.*;
+import java.util.*;
+/**
+ *
+ * @author margaret
+ */
+public class Reformatter {
+
+    /**
+     * @param arg_sInputFileName
+     * @param arg_sOutputFileName
+     * @throws java.lang.Exception */
+    public void reformatRSID(String arg_sInputFileName, String arg_sOutputFileName)
+    throws Exception {
+        BufferedReader vcfReader = new BufferedReader(new FileReader(arg_sInputFileName));
+		String sCurrentLine;
+        try (PrintWriter out = new PrintWriter(new FileWriter(arg_sOutputFileName))) {
+            while ((sCurrentLine = vcfReader.readLine()) != null) {
+                String [] aVCFlines = sCurrentLine.split(" ");
+                String [] aVCFids= new String[] {aVCFlines[0], aVCFlines[1], aVCFlines[2]};
+                String patternMULTI = "((.)*(esv)[0-9]*.*|(ss)[0-9]*.*)|[ALUBICNVDPEMGSQYW].*";                
+                String firstPass = Pattern.compile(patternMULTI).matcher(aVCFids[2]).replaceAll(".");
+                String patternSYMB = "[;.]{2,}";
+                String secondPass = Pattern.compile(patternSYMB).matcher(firstPass).replaceAll("");
+                String output = aVCFids[0] + "\t" + aVCFids[1] + "\t" + secondPass;
+                out.println(output);
+            }
+        }
+	 
+}
+    public static void main(String[] args) {
+		Reformatter formatter = new Reformatter();
+                String args_sInputFileName = "C:\\Users\\mlinan\\Desktop\\VCF5.txt";
+                String arg_sOutputFileName =  "C:\\Users\\mlinan\\Desktop\\RSID_official.vcf";
+		try { 
+			formatter.reformatRSID(args_sInputFileName, arg_sOutputFileName);
+		} catch (Exception exp){
+			exp.printStackTrace();
+		}
+	}
+}
+
+// cd c:\\projects\\java
+// javac -d classes -cp classes src\\VCFUtil\\VCFReformatter_v2.java
+// java -cp classes VCFUtil.VCFReformatter C:\\Users\\margaret\\Desktop\\ids1KG_noHeader.vcf C:\\Users\\margaret\\Desktop\\RSIDoutput.txt
+
+// Steps for prepping the concatenated VCF file
+// 1) study the header of one VCF file
+// 2) Use awk to print only the first three columns of the concatenated VCF file
+// 3) USE EGREP -V " " FILE.VCF > NEW.VCF to remove the the header elements from the concatenated VCF file (these symbols consist of #, use words to remove these header lines as well)
+// 4) Use awk to find uniq elements in each column :  
+//     awk '$1 !~ /[0-9]*/ {print $1} concatVCF | sort -n | uniq
+//     awk '$2 !~ /[0-9]*/ {print $2}' concatVCF | sort -n | uniq
+//     awk '$3 !~ /rs/ {print $3}' concatVCF | sort -n | uniq
