@@ -1,0 +1,60 @@
+/*
+ * Author: Margaret Linan
+ * Organization: SII
+ * Purpose: To find telomeric repeat patterns in sequences from a FASTQ. 
+ * Date: 9/07/2016
+ * Summary: Creates a text file that contains two columns: original FASTQ entries and tagged FASTQ entries
+ */
+package patternseq1;
+import java.io.*;
+import java.util.regex.*;
+
+/**
+ *
+ * @author margaret
+ */
+public class PatternSeq1 {
+       
+    public void replacePattern(String arg_sInputFileName1, String arg_sOutputFileName1)
+   
+        throws Exception {
+        BufferedReader dataReader = new BufferedReader(new FileReader(arg_sInputFileName1)); 
+        String sCurrentLine;
+       
+        try (PrintWriter taggedTelomereGCs = new PrintWriter(new FileWriter(arg_sOutputFileName1))) {
+       
+            while ((sCurrentLine = dataReader.readLine()) != null) {
+                String[] aLines = sCurrentLine.split(" ");
+                String[] aContents = new String[] {aLines[0]};
+                String sPatternONE = "(TTAGGG{1,})\\1+";                
+                String sFirstPass = Pattern.compile(sPatternONE).matcher(aContents[0]).replaceAll("(tp1)"); 
+                String sPatternTWO = "(TCAGGG{1,})\\1+";
+                String sSecondPass = Pattern.compile(sPatternTWO).matcher(sFirstPass).replaceAll("(tp2)"); 
+                String sPatternTHREE = "(TGAGGG{1,})\\1+";
+                String sThirdPass = Pattern.compile(sPatternTHREE).matcher(sSecondPass).replaceAll("(tp3)"); 
+                String sPatternFOUR = "(TTGGGG{1,})\\1+";
+                String sFourthPass = Pattern.compile(sPatternFOUR).matcher(sThirdPass).replaceAll("(tp4)"); 
+                String sPatternFIVE = "(GC{1,})\\1+";
+                String sFifthPass = Pattern.compile(sPatternFIVE).matcher(sFourthPass).replaceAll("(gc)");        
+             
+               // String sPatternALL = "(\\(tp1\\)|\\(tp2\\)|\\(tp3\\)|\\(tp4\\)|\\(gc\\)){1,}"; 
+              //  Pattern all = Pattern.compile(sPatternALL); Matcher t = all.matcher(sFifthPass);
+                
+                String sDetectedPatterns = aContents[0] + "\t" + sFifthPass;
+                taggedTelomereGCs.println(sDetectedPatterns);
+            }}}
+  
+      
+    public static void main(String[] args) {
+            PatternSeq1 analyzer = new PatternSeq1();
+                String arg_sInputFileName1 = "C:\\Users\\Margaret\\Desktop\\PatternSeq\\sample.fastq";
+                String arg_sOutputFileName1 = "C:\\Users\\Margaret\\Desktop\\PatternSeq\\Pattern_Analysis_Results.txt";
+          
+		try { 
+			analyzer.replacePattern(arg_sInputFileName1, arg_sOutputFileName1);
+                       
+                        
+		} catch (Exception exp){
+                    
+}}}
+        
