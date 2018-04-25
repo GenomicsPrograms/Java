@@ -1,6 +1,6 @@
 // Modified by ML 
 // Source: https://www.quickprogrammingtips.com/java/how-to-copy-files-from-one-folder-to-another-in-java.html
-// Look for a string in a source directory and transfer files containing that string to another directory
+// Look for a string in a source directory and transfer files containing that string in their name to another directory
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates */
